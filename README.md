@@ -152,35 +152,73 @@ pip install -r req.txt
 
 ## 🚀 Quick Start
 
-```python
-from machpoint import MachPoint
+### Running Benchmarks
 
-app = MachPoint()
+The repository includes a full benchmark suite comparing MachPoint against popular Python frameworks. You can choose between two benchmarking tools:
 
-@app.get("/hello")
-def hello():
-    return {"message": "Hello, World!"}
-
-if __name__ == "__main__":
-    app.start()
-```
-
-**Run the application:**
+**Run benchmarks:**
 ```bash
-python -m examples.basic_app
+cd benchmarks
+bash benchmark.sh
 ```
 
-**Test the endpoint:**
+You will be prompted to choose your benchmarking tool:
+
+```
+Choose benchmarking tool:
+1) autocannon (Node.js-based)
+2) wrk (C-based, lower overhead)
+Enter choice (1 or 2):
+```
+
+#### Option 1: Benchmarking with `autocannon`
+
+**Install (automatic if you select option 1):**
 ```bash
-curl http://localhost:8080/hello
+npm install autocannon
 ```
 
-**Expected response:**
-```json
-{
-  "message": "Hello, World!"
-}
+**Output example (100 concurrent connections, 15 seconds):**
 ```
+┌─────────────┬──────────┬──────────┬──────────┬─────────────┐
+│ Stat        │ 2.5%     │ 50%      │ 97.5%    │ Avg         │
+├─────────────┼──────────┼──────────┼──────────┼─────────────┤
+│ Latency ms  │ 1        │ 2        │ 5        │ 2.3         │
+└─────────────┴──────────┴──────────┴──────────┴─────────────┘
+┌─────────────┬──────────┬──────────┬──────────┬─────────────┐
+│ Stat        │ 1%       │ 10%      │ 100%     │ Total       │
+├─────────────┼──────────┼──────────┼──────────┼─────────────┤
+│ Req/sec     │ 38920    │ 41000    │ 42500    │ 1,276,500   │
+└─────────────┴──────────┴──────────┴──────────┴─────────────┘
+```
+
+#### Option 2: Benchmarking with `wrk`
+
+**Install:**
+```bash
+# Debian/Ubuntu
+sudo apt-get install wrk
+
+# macOS
+brew install wrk
+```
+
+**Output example (4 threads, 100 concurrent connections, 15 seconds):**
+```
+Running 15s test @ http://localhost:8007/hello
+  4 threads and 100 connections
+  Thread Stats    Avg      Stdev     Max      +/- Stdev
+    Latency     2.36ms    3.45ms    48.2ms   90.25%
+    Req/Sec    10.63k     1.93k    13.64k    81.00%
+
+422969 requests in 15.01s, 68.17MB read
+Requests/sec: 28197.54
+Transfer/sec: 4.54MB
+```
+
+**Frameworks tested:** FastAPI, Starlette, Sanic, Tornado, Flask, MachPoint
+
+> **Tip:** `wrk` is typically faster than `autocannon` as it's written in C with lower overhead, making it ideal for high-throughput benchmarking.
 
 ---
 
@@ -191,19 +229,6 @@ MachPoint automatically generates OpenAPI documentation for all registered route
 ```
 http://localhost:8080/swagger/
 ```
-
----
-
-## 🧪 Running Benchmarks
-
-The repository includes a full benchmark suite comparing MachPoint against popular Python frameworks.
-
-```bash
-cd benchmarks
-./benchmark.sh
-```
-
-**Frameworks tested:** FastAPI, Starlette, Sanic, Tornado, Flask, MachPoint
 
 ---
 
